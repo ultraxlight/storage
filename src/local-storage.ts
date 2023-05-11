@@ -3,7 +3,7 @@
  * @param {string} title Main List Item content
  * @returns {Schema} List Item object
  */
-export const create<Schema> = (title = ''): Schema => {
+export const create = <Schema>(title = ''): Schema => {
   const listItem = { id: crypto.randomUUID(), title }
 
   localStorage.setItem(listItem.id, JSON.stringify(listItem))
@@ -11,7 +11,7 @@ export const create<Schema> = (title = ''): Schema => {
   return listItem
 }
 
-export const get = (id?: string): null | Schema | Schema[] => {
+export const get = <Schema>(id?: string): null | Schema | Schema[] => {
   if (id) {
     const listItem = localStorage.getItem(id)
 
