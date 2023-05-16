@@ -1,17 +1,20 @@
+export interface Item {id: string}
+
 /**
- * Create List Item
- * @param {string} title Main List Item content
- * @returns {Schema} List Item object
+ * Create Item
+ * @param {Object} Partial Item
+ * @returns {Schema} Item object
  */
-export const create = <Schema>(title = ''): Schema => {
-  const listItem = { id: crypto.randomUUID(), title }
+export const create = <Schema extends Item>(partialItem?: Partial<Schema>): Schema => {
+  const item = { id: crypto.randomUUID(), ...partialItem }
 
-  localStorage.setItem(listItem.id, JSON.stringify(listItem))
+  localStorage.setItem(item.id, JSON.stringify(item))
 
-  return listItem
+  // @ts-ignore Can't get this sorted
+  return item
 }
 
-export const get = <Schema>(id?: string): null | Schema | Schema[] => {
+export const get = <Schema extends Item>(id?: string): null | Schema | Schema[] => {
   if (id) {
     const listItem = localStorage.getItem(id)
 
@@ -27,3 +30,10 @@ export const get = <Schema>(id?: string): null | Schema | Schema[] => {
   }
 }
 
+export const remove = (id: string) => {
+  localStorage.removeItem(id)
+}
+
+export const removeAll = () => {
+  localStorage.clear()
+}

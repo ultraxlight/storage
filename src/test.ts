@@ -1,35 +1,37 @@
-import { assertEquals } from 'https://deno.land/std@0.168.0/testing/asserts.ts'
-import { create, get } from './local-storage.ts'
+import { assert, assertEquals } from 'https://deno.land/std@0.168.0/testing/asserts.ts'
+import { create, get, remove, removeAll } from './local-storage.ts'
+import type { Item } from './local-storage.ts'
 
-Deno.test('Empty call creates full object', () => {
-  const newLi = create()
-  assertEquals(typeof newLi.id, 'string')
-  assertEquals(newLi.title, '')
+interface Schema extends Item {title: string}
+
+Deno.test('Empty call creates object with just ID', () => {
+  const newItem = create()
+  assertEquals(typeof newItem.id, 'string')
 })
 
 Deno.test('Title can be passed', () => {
-  const newLi = create('Mow the lawn')
-  assertEquals(typeof newLi.id, 'string')
-  assertEquals(newLi.title, 'Mow the lawn')
+  const newItem = create<Schema>({title: 'Mow the lawn'})
+  assertEquals(typeof newItem.id, 'string')
+  assertEquals(newItem.title, 'Mow the lawn')
 })
 
 Deno.test('Get can retrieve single', () => {
-  const newLi = create('Mow the lawn')
-  const retrievedLi = get(newLi.id)
+  const newItem = create<Schema>({title: 'Mow the lawn'})
+  const retrievedItem = get<Schema>(newItem.id)
   assertEquals(
-    newLi.id,
-    retrievedLi && !Array.isArray(retrievedLi) && retrievedLi.id,
+    newItem.id,
+    retrievedItem && !Array.isArray(retrievedItem) && retrievedItem.id,
   )
   assertEquals(
-    newLi.title,
-    retrievedLi && !Array.isArray(retrievedLi) && retrievedLi.title,
+    newItem.title,
+    retrievedItem && !Array.isArray(retrievedItem) && retrievedItem.title,
   )
 })
 
 Deno.test('Get can retrieve multiple', () => {
-  const newLi1 = create('Mow the lawn')
-  const newLi2 = create('Mow the lawn 2')
-  const retrievedLis = get()
+  const newLi1 = create<Schema>({title: 'Mow the lawn'})
+  const newLi2 = create<Schema>({title: 'Mow the lawn 2'})
+  const retrievedLis = get<Schema>()
   const retrievedLi1 = Array.isArray(retrievedLis) &&
     retrievedLis.find((rLi) => rLi.id === newLi1.id)
   const retrievedLi2 = Array.isArray(retrievedLis) &&
@@ -45,4 +47,37 @@ Deno.test('Get can retrieve multiple', () => {
   )
 })
 
-Deno.test('Get returns null', () => {})
+Deno.test('remove removes', () => {
+  const newItem = create<Schema>({title: 'Mow the lawn'})
+  const retrievedItemBeforeRemove = get<Schema>(newItem.id)
+
+  assertEquals(
+    !Array.isArray(retrievedItemBeforeRemove) && retrievedItemBeforeRemove?.title,
+    'Mow the lawn'
+  )
+
+  remove(newItem.id)
+
+  assertEquals(
+    get<Schema>(newItem.id),
+    null,
+  )
+})
+
+Deno.test('removeAll removes all', () => {
+  create<Schema>({title: 'Mow the lawn'})
+  create<Schema>({title: 'Mow the lawn 2'})
+  
+  const items = get()
+
+  assert(
+    Array.isArray(items) && items.length > 1
+  )
+
+  removeAll()
+
+  assertEquals(
+    get<Schema>(),
+    [],
+  )
+})
