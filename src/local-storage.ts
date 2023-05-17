@@ -1,11 +1,15 @@
-export interface Item {id: string}
+export interface Item {
+  id: string
+}
 
 /**
  * Create Item
  * @param {Object} Partial Item
  * @returns {Schema} Item object
  */
-export const create = <Schema extends Item>(partialItem?: Partial<Schema>): Schema => {
+export const create = <Schema extends Item>(
+  partialItem?: Partial<Schema>,
+): Schema => {
   const item = { id: crypto.randomUUID(), ...partialItem }
 
   localStorage.setItem(item.id, JSON.stringify(item))
@@ -14,7 +18,9 @@ export const create = <Schema extends Item>(partialItem?: Partial<Schema>): Sche
   return item
 }
 
-export const get = <Schema extends Item>(id?: string): null | Schema | Schema[] => {
+export const get = <Schema extends Item>(
+  id?: string,
+): null | Schema | Schema[] => {
   if (id) {
     const listItem = localStorage.getItem(id)
 
@@ -42,6 +48,6 @@ export const removeAll = () => {
   const items = get()
 
   localStorage.clear()
-  
+
   return items
 }

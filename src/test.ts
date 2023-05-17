@@ -1,8 +1,13 @@
-import { assert, assertEquals } from 'https://deno.land/std@0.168.0/testing/asserts.ts'
+import {
+  assert,
+  assertEquals,
+} from 'https://deno.land/std@0.168.0/testing/asserts.ts'
 import { create, get, remove, removeAll } from './local-storage.ts'
 import type { Item } from './local-storage.ts'
 
-interface Schema extends Item {title: string}
+interface Schema extends Item {
+  title: string
+}
 
 Deno.test('Empty call creates object with just ID', () => {
   const newItem = create()
@@ -10,13 +15,13 @@ Deno.test('Empty call creates object with just ID', () => {
 })
 
 Deno.test('Title can be passed', () => {
-  const newItem = create<Schema>({title: 'Mow the lawn'})
+  const newItem = create<Schema>({ title: 'Mow the lawn' })
   assertEquals(typeof newItem.id, 'string')
   assertEquals(newItem.title, 'Mow the lawn')
 })
 
 Deno.test('Get can retrieve single', () => {
-  const newItem = create<Schema>({title: 'Mow the lawn'})
+  const newItem = create<Schema>({ title: 'Mow the lawn' })
   const retrievedItem = get<Schema>(newItem.id)
   assertEquals(
     newItem.id,
@@ -29,8 +34,8 @@ Deno.test('Get can retrieve single', () => {
 })
 
 Deno.test('Get can retrieve multiple', () => {
-  const newLi1 = create<Schema>({title: 'Mow the lawn'})
-  const newLi2 = create<Schema>({title: 'Mow the lawn 2'})
+  const newLi1 = create<Schema>({ title: 'Mow the lawn' })
+  const newLi2 = create<Schema>({ title: 'Mow the lawn 2' })
   const retrievedLis = get<Schema>()
   const retrievedLi1 = Array.isArray(retrievedLis) &&
     retrievedLis.find((rLi) => rLi.id === newLi1.id)
@@ -48,12 +53,13 @@ Deno.test('Get can retrieve multiple', () => {
 })
 
 Deno.test('remove removes', () => {
-  const newItem = create<Schema>({title: 'Mow the lawn'})
+  const newItem = create<Schema>({ title: 'Mow the lawn' })
   const retrievedItemBeforeRemove = get<Schema>(newItem.id)
 
   assertEquals(
-    !Array.isArray(retrievedItemBeforeRemove) && retrievedItemBeforeRemove?.title,
-    'Mow the lawn'
+    !Array.isArray(retrievedItemBeforeRemove) &&
+      retrievedItemBeforeRemove?.title,
+    'Mow the lawn',
   )
 
   remove(newItem.id)
@@ -64,14 +70,24 @@ Deno.test('remove removes', () => {
   )
 })
 
+Deno.test('remove returns removed', () => {
+  const newItem = create<Schema>({ title: 'Mow the lawn' })
+  const removedItem = remove(newItem.id)
+
+  assertEquals(
+    newItem,
+    removedItem,
+  )
+})
+
 Deno.test('removeAll removes all', () => {
-  create<Schema>({title: 'Mow the lawn'})
-  create<Schema>({title: 'Mow the lawn 2'})
-  
+  create<Schema>({ title: 'Mow the lawn' })
+  create<Schema>({ title: 'Mow the lawn 2' })
+
   const items = get()
 
   assert(
-    Array.isArray(items) && items.length > 1
+    Array.isArray(items) && items.length > 1,
   )
 
   removeAll()
@@ -79,5 +95,17 @@ Deno.test('removeAll removes all', () => {
   assertEquals(
     get<Schema>(),
     [],
+  )
+})
+
+Deno.test('removeAll returns all', () => {
+  const item1 = create<Schema>({ title: 'Mow the lawn' })
+  const item2 = create<Schema>({ title: 'Mow the lawn 2' })
+
+  const removed = removeAll()
+
+  assertEquals(
+    [item1, item2].sort(),
+    removed && Array.isArray(removed) && removed.sort(),
   )
 })
