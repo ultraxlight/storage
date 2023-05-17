@@ -31,9 +31,17 @@ export const get = <Schema extends Item>(id?: string): null | Schema | Schema[] 
 }
 
 export const remove = (id: string) => {
+  const item = get(id)
+
   localStorage.removeItem(id)
+
+  return item
 }
 
 export const removeAll = () => {
+  const items = get()
+
   localStorage.clear()
+  
+  return items
 }
