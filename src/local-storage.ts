@@ -1,15 +1,6 @@
-export interface Item {
-  id: string
-}
+import type { Create, Get, Item, Remove, RemoveAll } from './types.ts'
 
-/**
- * Create Item
- * @param {Object} Partial Item
- * @returns {Schema} Item object
- */
-export const create = (
-  partialItem?: Record<string, unknown>,
-): { id: string; [key: string]: unknown } => {
+export const create: Create = (partialItem) => {
   const item = { id: crypto.randomUUID(), ...partialItem }
 
   localStorage.setItem(item.id, JSON.stringify(item))
@@ -17,27 +8,23 @@ export const create = (
   return item
 }
 
-export function get<Schema extends Item>(id: string): null | Schema
-export function get<Schema extends Item>(): null | Schema[]
-export function get<Schema extends Item>(
-  id?: string,
-): null | Schema | Schema[] {
+export const get: Get = <Schema extends Item>(id?: string) => {
   if (id) {
     const listItem = localStorage.getItem(id)
 
     if (listItem) {
       return JSON.parse(listItem)
     } else return null
-  } else {
-    const listItems = Object.values({ ...localStorage }).map((str) =>
-      JSON.parse(str)
-    )
-
-    return listItems
   }
+
+  const listItems: Schema[] = Object.values({ ...localStorage }).map((str) =>
+    JSON.parse(str)
+  )
+
+  return listItems
 }
 
-export const remove = <Schema extends Item>(id: string): Schema | null => {
+export const remove: Remove = <Schema extends Item>(id: string) => {
   const item = get<Schema>(id)
 
   localStorage.removeItem(id)
@@ -45,10 +32,17 @@ export const remove = <Schema extends Item>(id: string): Schema | null => {
   return item
 }
 
-export const removeAll = <Schema extends Item>(): Schema[] | null => {
+export const removeAll: RemoveAll = <Schema extends Item>() => {
   const items = get<Schema>()
 
   localStorage.clear()
 
   return items
+}
+
+export const Storage = {
+  create,
+  get,
+  remove,
+  removeAll,
 }

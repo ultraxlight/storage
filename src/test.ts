@@ -3,9 +3,9 @@ import {
   assertEquals,
 } from 'https://deno.land/std@0.168.0/testing/asserts.ts'
 import { create, get, remove, removeAll } from './local-storage.ts'
-import type { Item } from './local-storage.ts'
 
-interface Schema extends Item {
+interface Schema {
+  id: string
   title: string
 }
 
