@@ -1,3 +1,7 @@
+/**
+ * @file 
+ */
+
 import type { Create, Get, Item, Remove, RemoveAll } from './types.ts'
 
 export const create: Create = (partialItem) => {
@@ -40,7 +44,7 @@ export const removeAll: RemoveAll = <Schema extends Item>() => {
   return items
 }
 
-export const Storage = {
+export default {
   create,
   get,
   remove,
