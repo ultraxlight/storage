@@ -2,7 +2,7 @@ import {
   assert,
   assertEquals,
 } from 'https://deno.land/std@0.168.0/testing/asserts.ts'
-import { create, get, remove, removeAll } from './local-storage.ts'
+import { create, get, getAll, remove, removeAll } from './local-storage.ts'
 
 interface Schema {
   id: string
@@ -36,7 +36,7 @@ Deno.test('Get can retrieve single', () => {
 Deno.test('Get can retrieve multiple', () => {
   const newLi1 = create({ title: 'Mow the lawn' })
   const newLi2 = create({ title: 'Mow the lawn 2' })
-  const retrievedLis = get<Schema>()
+  const retrievedLis = getAll<Schema>()
   const retrievedLi1 = Array.isArray(retrievedLis) &&
     retrievedLis.find((rLi) => rLi.id === newLi1.id)
   const retrievedLi2 = Array.isArray(retrievedLis) &&
@@ -84,7 +84,7 @@ Deno.test('removeAll removes all', () => {
   create({ title: 'Mow the lawn' })
   create({ title: 'Mow the lawn 2' })
 
-  const items = get()
+  const items = getAll()
 
   assert(
     Array.isArray(items) && items.length > 1,
@@ -93,7 +93,7 @@ Deno.test('removeAll removes all', () => {
   removeAll()
 
   assertEquals(
-    get<Schema>(),
+    getAll<Schema>(),
     [],
   )
 })

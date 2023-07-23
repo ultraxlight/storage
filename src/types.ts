@@ -24,7 +24,7 @@ export interface Get {
  * Get all Items from storage
  * @returns {Item[]} Items
  */
-export interface Get {
+export interface GetAll {
   <Schema extends Item>(): Schema[]
 }
 
