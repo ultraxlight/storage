@@ -18,7 +18,7 @@ export const get: Get = (id: string) => {
   if (listItem) {
     return JSON.parse(listItem)
   }
-  
+
   return null
 }
 
@@ -49,6 +49,7 @@ export const removeAll: RemoveAll = <Schema extends Item>() => {
 export default {
   create,
   get,
+  getAll,
   remove,
   removeAll,
 }
