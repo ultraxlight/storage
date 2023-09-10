@@ -30,6 +30,19 @@ export const getAll: GetAll = <Schema extends Item>() => {
   return listItems
 }
 
+export const update = <Schema extends Item>(id: string, update: Partial<Schema>) => {
+  const item = get(id)
+
+  if(item){
+    const updatedItem = {...item, ...update}
+    localStorage.setItem(id, JSON.stringify(updatedItem))
+
+    return updatedItem
+  } else {
+    throw Error(`Item with ID: '${id}' not found`)
+  }
+}
+
 export const remove: Remove = <Schema extends Item>(id: string) => {
   const item = get<Schema>(id)
 
