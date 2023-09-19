@@ -76,5 +76,5 @@ export default {
   getAll,
   remove,
   removeAll,
-  update
+  update,
 }
