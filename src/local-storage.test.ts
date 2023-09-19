@@ -1,9 +1,16 @@
 import {
   assert,
   assertEquals,
-  assertThrows
+  assertThrows,
 } from 'https://deno.land/std@0.168.0/testing/asserts.ts'
-import { create, get, getAll, update, remove, removeAll } from './local-storage.ts'
+import {
+  create,
+  get,
+  getAll,
+  remove,
+  removeAll,
+  update,
+} from './local-storage.ts'
 
 interface Schema {
   id: string
@@ -33,14 +40,17 @@ Deno.test('Get can retrieve single', () => {
     retrievedItem && !Array.isArray(retrievedItem) && retrievedItem.title,
   )
 })
+
 Deno.test('Update updates', () => {
   const newItem = create({ title: 'Mow the lawn' })
-  const updatedItem = update<Schema>(newItem.id, {title: "Mow the neighbor's lawn"})
+  const updatedItem = update<Schema>(newItem.id, {
+    title: 'Mow the neighbor\'s lawn',
+  })
   const retrievedItem = get<Schema>(newItem.id)
-  
+
   assertEquals(
     retrievedItem?.title,
-    "Mow the neighbor's lawn",
+    'Mow the neighbor\'s lawn',
   )
 
   assertEquals(
@@ -51,10 +61,10 @@ Deno.test('Update updates', () => {
 
 Deno.test('Update w/ bad ID throws', () => {
   assertThrows(
-    () => update<Schema>('WRONG', {title: "Mow the neighbor's lawn"}),
+    () => update<Schema>('WRONG', { title: 'Mow the neighbor\'s lawn' }),
     Error,
-    "Item with ID: 'WRONG' not found",
-    )
+    'Item with ID: \'WRONG\' not found',
+  )
 })
 
 Deno.test('GetAll can retrieve multiple', () => {

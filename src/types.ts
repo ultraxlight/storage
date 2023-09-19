@@ -28,6 +28,13 @@ export interface GetAll {
   <Schema extends Item>(): Schema[]
 }
 
+export interface Update {
+  <Schema extends Item>(
+    id: string,
+    update: Partial<Schema>
+  ): Schema
+}
+
 /**
  * Remove an item from storage
  * @param {string} id ID of item to remove

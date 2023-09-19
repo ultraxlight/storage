@@ -2,7 +2,15 @@
  * @file LocalStorage implementation of Storage
  */
 
-import type { Create, Get, GetAll, Item, Remove, RemoveAll } from './types.ts'
+import type {
+  Create,
+  Get,
+  GetAll,
+  Item,
+  Remove,
+  RemoveAll,
+  Update
+} from './types.ts'
 
 export const create: Create = (partialItem) => {
   const item = { id: crypto.randomUUID(), ...partialItem }
@@ -30,11 +38,14 @@ export const getAll: GetAll = <Schema extends Item>() => {
   return listItems
 }
 
-export const update = <Schema extends Item>(id: string, update: Partial<Schema>) => {
-  const item = get(id)
+export const update: Update = <Schema extends Item>(
+  id: string,
+  update: Partial<Schema>,
+) => {
+  const item = get<Schema>(id)
 
-  if(item){
-    const updatedItem = {...item, ...update}
+  if (item) {
+    const updatedItem = { ...item, ...update }
     localStorage.setItem(id, JSON.stringify(updatedItem))
 
     return updatedItem
