@@ -9,7 +9,7 @@ import type {
   Item,
   Remove,
   RemoveAll,
-  Update
+  Update,
 } from './types.ts'
 
 export const create: Create = (partialItem) => {
@@ -76,4 +76,5 @@ export default {
   getAll,
   remove,
   removeAll,
+  update
 }

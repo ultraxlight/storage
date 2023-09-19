@@ -31,7 +31,7 @@ export interface GetAll {
 export interface Update {
   <Schema extends Item>(
     id: string,
-    update: Partial<Schema>
+    update: Partial<Schema>,
   ): Schema
 }
 
