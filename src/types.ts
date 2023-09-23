@@ -28,6 +28,13 @@ export interface GetAll {
   <Schema extends Item>(): Schema[]
 }
 
+/**
+ * Update an Item in storage
+ * @param {string} id Item ID
+ * @param {Object} update Data to update
+ * @returns {Item} UpdItem not found
+ * @throws Will throw an error if Item not found
+ */
 export interface Update {
   <Schema extends Item>(
     id: string,
