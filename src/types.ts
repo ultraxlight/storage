@@ -7,9 +7,9 @@ export interface Item {
  * @param {Object} Partial Item
  * @returns {Schema} Item object
  */
-export type Create = (
-  partialItem?: Record<string, unknown>,
-) => { id: string; [key: string]: unknown }
+export interface Create {
+  (partialItem?: Record<string, unknown>): { id: string; [key: string]: unknown }
+}
 
 /**
  * Get a single Item from storage
@@ -47,10 +47,14 @@ export interface Update {
  * @param {string} id ID of item to remove
  * @returns {Item|null}
  */
-export type Remove = <Schema extends Item>(id: string) => Schema | null
+export interface Remove {
+  <Schema extends Item>(id: string): Schema | null
+}
 
 /**
  * Remove ALL items
  * @returns {Item[]}
  */
-export type RemoveAll = <Schema extends Item>() => Schema[] | null
+export interface RemoveAll {
+  <Schema extends Item>(): Schema[] | null
+}
