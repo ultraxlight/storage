@@ -10,9 +10,9 @@ import type {
   Remove,
   RemoveAll,
   Update,
-} from './types.ts'
+} from '../src/types.ts'
 
-export const create: Create = (partialItem) => {
+export const create: Create = <Schema extends Item>(partialItem?: Partial<Schema>) => {
   const item = { id: crypto.randomUUID(), ...partialItem }
 
   localStorage.setItem(item.id, JSON.stringify(item))

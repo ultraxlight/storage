@@ -23,13 +23,13 @@ Deno.test('Empty call creates object with just ID', () => {
 })
 
 Deno.test('Attribute can be passed', () => {
-  const newItem = create({ title: 'Mow the lawn' })
+  const newItem = create<Schema>({ title: 'Mow the lawn' })
   assertEquals(typeof newItem.id, 'string')
   assertEquals(newItem.title, 'Mow the lawn')
 })
 
 Deno.test('Get can retrieve single', () => {
-  const newItem = create({ title: 'Mow the lawn' })
+  const newItem = create<Schema>({ title: 'Mow the lawn' })
   const retrievedItem = get<Schema>(newItem.id)
   assertEquals(
     newItem.id,
@@ -42,7 +42,7 @@ Deno.test('Get can retrieve single', () => {
 })
 
 Deno.test('Update updates', () => {
-  const newItem = create({ title: 'Mow the lawn' })
+  const newItem = create<Schema>({ title: 'Mow the lawn' })
   const updatedItem = update<Schema>(newItem.id, {
     title: 'Mow the neighbor\'s lawn',
   })
@@ -68,8 +68,8 @@ Deno.test('Update w/ bad ID throws', () => {
 })
 
 Deno.test('GetAll can retrieve multiple', () => {
-  const newLi1 = create({ title: 'Mow the lawn' })
-  const newLi2 = create({ title: 'Mow the lawn 2' })
+  const newLi1 = create<Schema>({ title: 'Mow the lawn' })
+  const newLi2 = create<Schema>({ title: 'Mow the lawn 2' })
   const retrievedLis = getAll<Schema>()
   const retrievedLi1 = Array.isArray(retrievedLis) &&
     retrievedLis.find((rLi) => rLi.id === newLi1.id)
@@ -87,7 +87,7 @@ Deno.test('GetAll can retrieve multiple', () => {
 })
 
 Deno.test('remove removes', () => {
-  const newItem = create({ title: 'Mow the lawn' })
+  const newItem = create<Schema>({ title: 'Mow the lawn' })
   const retrievedItemBeforeRemove = get<Schema>(newItem.id)
 
   assertEquals(
@@ -105,7 +105,7 @@ Deno.test('remove removes', () => {
 })
 
 Deno.test('remove returns removed', () => {
-  const newItem = create({ title: 'Mow the lawn' })
+  const newItem = create<Schema>({ title: 'Mow the lawn' })
   const removedItem = remove(newItem.id)
 
   assertEquals(
@@ -115,8 +115,8 @@ Deno.test('remove returns removed', () => {
 })
 
 Deno.test('removeAll removes all', () => {
-  create({ title: 'Mow the lawn' })
-  create({ title: 'Mow the lawn 2' })
+  create<Schema>({ title: 'Mow the lawn' })
+  create<Schema>({ title: 'Mow the lawn 2' })
 
   const items = getAll()
 
@@ -133,8 +133,8 @@ Deno.test('removeAll removes all', () => {
 })
 
 Deno.test('removeAll returns all', () => {
-  const item1 = create({ title: 'Mow the lawn' })
-  const item2 = create({ title: 'Mow the lawn 2' })
+  const item1 = create<Schema>({ title: 'Mow the lawn' })
+  const item2 = create<Schema>({ title: 'Mow the lawn 2' })
 
   const sortByTitle = (
     a: Record<string, unknown>,

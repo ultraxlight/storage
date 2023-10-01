@@ -8,7 +8,9 @@ export interface Item {
  * @returns {Schema} Item object
  */
 export interface Create {
-  (partialItem?: Record<string, unknown>): { id: string; [key: string]: unknown }
+  <Schema extends Item>(
+    partialItem?: Partial<Schema>,
+  ): { id: string; [key: string]: unknown }
 }
 
 /**
