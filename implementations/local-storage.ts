@@ -12,7 +12,9 @@ import type {
   Update,
 } from '../src/types.ts'
 
-export const create: Create = <Schema extends Item>(partialItem?: Partial<Schema>) => {
+export const create: Create = <Schema extends Item>(
+  partialItem?: Partial<Schema>,
+) => {
   const item = { id: crypto.randomUUID(), ...partialItem }
 
   localStorage.setItem(item.id, JSON.stringify(item))
