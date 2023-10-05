@@ -10,7 +10,7 @@ import {
   remove,
   removeAll,
   update,
-} from './local-storage.ts'
+} from './memory.ts'
 
 interface Schema {
   id: string
