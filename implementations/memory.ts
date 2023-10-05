@@ -93,6 +93,8 @@ export const removeAll: RemoveAll = <Schema extends Item>() => {
 export default {
   create,
   get,
+  getAll,
   remove,
   removeAll,
+  update,
 }
