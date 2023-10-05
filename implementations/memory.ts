@@ -84,7 +84,7 @@ export const remove: Remove = <Schema extends Item>(id: string) => {
 
 export const removeAll: RemoveAll = <Schema extends Item>() => {
   const items = Object.values(getDB<Schema>())
-  
+
   DB = {}
 
   return items

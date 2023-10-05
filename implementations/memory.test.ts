@@ -3,14 +3,7 @@ import {
   assertEquals,
   assertThrows,
 } from 'https://deno.land/std@0.168.0/testing/asserts.ts'
-import {
-  create,
-  get,
-  getAll,
-  remove,
-  removeAll,
-  update,
-} from './memory.ts'
+import { create, get, getAll, remove, removeAll, update } from './memory.ts'
 
 interface Schema {
   id: string
