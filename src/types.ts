@@ -2,6 +2,11 @@ export interface Item {
   id: string
 }
 
+export interface Init {
+  // deno-lint-ignore no-explicit-any
+  (initObject?: { [key: string]: any }): Promise<void>
+}
+
 /**
  * Create Item
  * @param {Object} Partial Item
@@ -10,7 +15,7 @@ export interface Item {
 export interface Create {
   <Schema extends Item>(
     partialItem?: Partial<Schema>,
-  ): { id: string; [key: string]: unknown }
+  ): Promise<Schema>
 }
 
 /**
@@ -19,7 +24,7 @@ export interface Create {
  * @returns {null|Item} Item or null
  */
 export interface Get {
-  <Schema extends Item>(id: string): null | Schema
+  <Schema extends Item>(id: string): Promise<null | Schema>
 }
 
 /**
@@ -27,7 +32,7 @@ export interface Get {
  * @returns {Item[]} Items
  */
 export interface GetAll {
-  <Schema extends Item>(): Schema[]
+  <Schema extends Item>(): Promise<Schema[]>
 }
 
 /**
@@ -41,7 +46,7 @@ export interface Update {
   <Schema extends Item>(
     id: string,
     update: Partial<Schema>,
-  ): Schema
+  ): Promise<Schema>
 }
 
 /**
@@ -50,7 +55,7 @@ export interface Update {
  * @returns {Item|null}
  */
 export interface Remove {
-  <Schema extends Item>(id: string): Schema | null
+  <Schema extends Item>(id: string): Promise<Schema | null>
 }
 
 /**
@@ -58,5 +63,15 @@ export interface Remove {
  * @returns {Item[]}
  */
 export interface RemoveAll {
-  <Schema extends Item>(): Schema[] | null
+  <Schema extends Item>(): Promise<Schema[] | null>
+}
+
+export default interface Storage {
+  create: Create
+  get: Get
+  getAll: GetAll
+  init: Init
+  remove: Remove
+  removeAll: RemoveAll
+  update: Update
 }

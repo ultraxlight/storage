@@ -3,4 +3,4 @@
 
 deno fmt
 deno lint
-deno test
+deno test --allow-read --allow-net

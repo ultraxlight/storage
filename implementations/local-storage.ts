@@ -6,20 +6,23 @@ import type {
   Create,
   Get,
   GetAll,
+  Init,
   Item,
   Remove,
   RemoveAll,
   Update,
 } from '../src/types.ts'
 
+export const init: Init = () => Promise.resolve()
+
 export const create: Create = <Schema extends Item>(
   partialItem?: Partial<Schema>,
 ) => {
-  const item = { id: crypto.randomUUID(), ...partialItem }
+  const item = { id: crypto.randomUUID(), ...partialItem } as Schema
 
   localStorage.setItem(item.id, JSON.stringify(item))
 
-  return item
+  return Promise.resolve(item)
 }
 
 export const get: Get = (id: string) => {
@@ -37,22 +40,22 @@ export const getAll: GetAll = <Schema extends Item>() => {
     JSON.parse(str)
   )
 
-  return listItems
+  return Promise.resolve(listItems)
 }
 
-export const update: Update = <Schema extends Item>(
+export const update: Update = async <Schema extends Item>(
   id: string,
   update: Partial<Schema>,
 ) => {
-  const item = get<Schema>(id)
+  const item = await get<Schema>(id)
 
   if (item) {
     const updatedItem = { ...item, ...update }
     localStorage.setItem(id, JSON.stringify(updatedItem))
 
-    return updatedItem
+    return Promise.resolve(updatedItem)
   } else {
-    throw Error(`Item with ID: '${id}' not found`)
+    return Promise.reject(Error(`Item with ID: '${id}' not found`))
   }
 }
 
@@ -76,6 +79,7 @@ export default {
   create,
   get,
   getAll,
+  init,
   remove,
   removeAll,
   update,

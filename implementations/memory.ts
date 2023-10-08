@@ -6,6 +6,7 @@ import type {
   Create,
   Get,
   GetAll,
+  Init,
   Item,
   Remove,
   RemoveAll,
@@ -27,49 +28,47 @@ const getDB = <Schema extends Item>(): Database<Schema> => {
   return DB
 }
 
+export const init: Init = () => Promise.resolve()
+
 export const create: Create = <Schema extends Item>(
   partialItem?: Partial<Schema>,
 ) => {
   const DB = getDB<Schema>()
-  const item = { id: crypto.randomUUID(), ...partialItem }
+  const item = { id: crypto.randomUUID(), ...partialItem } as Schema
 
-  DB[item.id] = item as Schema
+  DB[item.id] = item
 
-  return item
+  return Promise.resolve(item)
 }
 
 export const get: Get = <Schema extends Item>(id: string) => {
   const DB = getDB<Schema>()
-  const listItem = DB[id]
+  const listItem: Schema | null = DB[id] || null // as Schema
 
-  if (listItem) {
-    return listItem
-  }
-
-  return null
+  return Promise.resolve(listItem) as Promise<Schema | null>
 }
 
 export const getAll: GetAll = <Schema extends Item>() => {
   const DB = getDB<Schema>()
   const listItems: Schema[] = Object.values(DB)
 
-  return listItems
+  return Promise.resolve(listItems)
 }
 
-export const update: Update = <Schema extends Item>(
+export const update: Update = async <Schema extends Item>(
   id: string,
   update: Partial<Schema>,
 ) => {
   const DB = getDB<Schema>()
-  const item = get<Schema>(id)
+  const item = await get<Schema>(id)
 
   if (item) {
-    const updatedItem = { ...item, ...update }
+    const updatedItem = { ...item, ...update } as Schema
     DB[id] = updatedItem
 
-    return updatedItem
+    return Promise.resolve(updatedItem)
   } else {
-    throw Error(`Item with ID: '${id}' not found`)
+    return Promise.reject(Error(`Item with ID: '${id}' not found`))
   }
 }
 
@@ -82,8 +81,8 @@ export const remove: Remove = <Schema extends Item>(id: string) => {
   return item
 }
 
-export const removeAll: RemoveAll = <Schema extends Item>() => {
-  const items = Object.values(getDB<Schema>())
+export const removeAll: RemoveAll = async <Schema extends Item>() => {
+  const items = Object.values(await getDB<Schema>())
 
   DB = {}
 
@@ -94,6 +93,7 @@ export default {
   create,
   get,
   getAll,
+  init,
   remove,
   removeAll,
   update,
