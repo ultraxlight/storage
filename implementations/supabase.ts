@@ -18,27 +18,48 @@ import type {
   Update,
 } from '../src/types.ts'
 
-// Create a single supabase client for interacting with your database
+/** Supabase client */
 // deno-lint-ignore no-explicit-any
 let supabase: null | SupabaseClient<any, 'public', any> = null
 
-export const init: Init = async (
-  opts, /*: { url: string; publicAnonKey: string; options?: object }*/
+/** Table name to read from */
+let tableName: null | string = null
+
+/**
+ * Initialize Supabase client
+ * @param {Object} opts Initialization options
+ * @param {string} opts.url Supabase URL
+ * @param {string} opts.publicAnonKey Supabase Public Anon Key
+ * @param {string} opts.tableName Supabase Table name
+ */
+export const init: Init = (
+  opts,
 ) => {
-  supabase = await createClient(opts?.url, opts?.publicAnonKey)
+  if (!opts) {
+    return Promise.reject('Missing init options')
+  }
+
+  if (!opts.tableName) {
+    return Promise.reject('Missing tableName in init options')
+  }
+
+  supabase = createClient(opts.url, opts.publicAnonKey)
+  tableName = opts.tableName
+
+  return Promise.resolve()
 }
 
 export const create: Create = async <Schema extends Item>(
   partialItem?: Partial<Schema>,
 ) => {
-  if (!supabase) {
+  if (!supabase || !tableName) {
     throw Error('Storage not initialized')
   }
 
   const item = { id: crypto.randomUUID(), ...partialItem }
 
   const { data, error } = await supabase
-    .from('list-items')
+    .from(tableName)
     .insert([item])
     .select()
 
@@ -50,12 +71,12 @@ export const create: Create = async <Schema extends Item>(
 }
 
 export const get: Get = async (id: string) => {
-  if (!supabase) {
+  if (!supabase || !tableName) {
     throw Error('Storage not initialized')
   }
 
   const { data, error } = await supabase
-    .from('list-items')
+    .from(tableName)
     .select()
     .eq('id', id)
 
@@ -71,12 +92,12 @@ export const get: Get = async (id: string) => {
 }
 
 export const getAll: GetAll = async () => {
-  if (!supabase) {
+  if (!supabase || !tableName) {
     throw Error('Storage not initialized')
   }
 
   const { data, error } = await supabase
-    .from('list-items')
+    .from(tableName)
     .select()
 
   if (error) {
@@ -90,12 +111,12 @@ export const update: Update = async <Schema extends Item>(
   id: string,
   update: Partial<Schema>,
 ) => {
-  if (!supabase) {
+  if (!supabase || !tableName) {
     throw Error('Storage not initialized')
   }
 
   const { data, error } = await supabase
-    .from('list-items')
+    .from(tableName)
     .update(update)
     .eq('id', id)
     .select()
@@ -110,12 +131,12 @@ export const update: Update = async <Schema extends Item>(
 }
 
 export const remove: Remove = async (id: string) => {
-  if (!supabase) {
+  if (!supabase || !tableName) {
     throw Error('Storage not initialized')
   }
 
   const { data, error } = await supabase
-    .from('list-items')
+    .from(tableName)
     .delete()
     .eq('id', id)
     .select()
@@ -130,12 +151,12 @@ export const remove: Remove = async (id: string) => {
 }
 
 export const removeAll: RemoveAll = async () => {
-  if (!supabase) {
+  if (!supabase || !tableName) {
     throw Error('Storage not initialized')
   }
 
   const { data, error } = await supabase
-    .from('list-items')
+    .from(tableName)
     .delete()
     .neq('id', crypto.randomUUID())
     .select()

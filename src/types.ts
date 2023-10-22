@@ -4,7 +4,7 @@ export interface Item {
 
 export interface Init {
   // deno-lint-ignore no-explicit-any
-  (initObject?: { [key: string]: any }): Promise<void>
+  <InitObj extends { [key: string]: any }>(initObject?: InitObj): Promise<void>
 }
 
 /**

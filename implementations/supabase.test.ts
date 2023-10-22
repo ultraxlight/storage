@@ -8,4 +8,8 @@ import Storage from './supabase.ts'
 
 import Tests from '../src/tests.ts'
 
-Tests(Storage, { url: supabaseUrl, publicAnonKey: supabasePublicAnonKey })
+Tests(Storage, {
+  url: supabaseUrl,
+  publicAnonKey: supabasePublicAnonKey,
+  tableName: 'list-items',
+})
