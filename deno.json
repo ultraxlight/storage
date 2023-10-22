@@ -8,5 +8,6 @@
     "build:docs": "deno doc ./src/types.ts",
     "test": "deno test --allow-read --allow-net",
     "version-bump": "deno run -A https://deno.land/x/version_bump@1.1.0/cli.ts",
+    "test:coverage": "rm -rf coverage && deno test --coverage=coverage --allow-read --allow-net && Deno coverage coverage"
   }
 }
