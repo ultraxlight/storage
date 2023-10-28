@@ -9,9 +9,9 @@ interface Schema {
   title: string
 }
 
-import Storage from '../src/types.ts'
+import { StorageInit } from '../src/types.ts'
 
-export default async function (storage: Storage, initOptions?: object) {
+export default async function (storage: StorageInit, initOptions?: object) {
   const db = await storage.init(initOptions)
 
   Deno.test('Standard Storage tests', async (t) => {

@@ -4,14 +4,7 @@ export interface Item {
 
 export interface Init {
   // deno-lint-ignore no-explicit-any
-  <InitObj extends { [key: string]: any }>(initObject?: InitObj): Promise<{
-    create: Create
-    get: Get
-    getAll: GetAll
-    update: Update
-    remove: Remove
-    removeAll: RemoveAll
-  }>
+  <InitObj extends { [key: string]: any }>(initObject?: InitObj): Promise<Storage>
 }
 
 /**
@@ -74,5 +67,14 @@ export interface RemoveAll {
 }
 
 export default interface Storage {
+  create: Create,
+  get: Get,
+  getAll: GetAll,
+  update: Update,
+  remove: Remove,
+  removeAll: RemoveAll
+}
+
+export interface StorageInit {
   init: Init
 }
