@@ -23,6 +23,7 @@
   "conventionalCommits.scopes": [
     "impl",
     "release",
-    "api"
+    "api",
+    "types"
   ]
 }
