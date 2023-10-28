@@ -21,6 +21,8 @@
   "peacock.color": "#832561",
   "deno.enable": true,
   "conventionalCommits.scopes": [
-    "impl"
+    "impl",
+    "release",
+    "api"
   ]
 }

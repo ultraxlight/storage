@@ -7,23 +7,7 @@ import {
   SupabaseClient,
 } from 'https://esm.sh/@supabase/supabase-js@2.38.0'
 
-import type {
-  Create,
-  Get,
-  GetAll,
-  Init,
-  Item,
-  Remove,
-  RemoveAll,
-  Update,
-} from '../src/types.ts'
-
-/** Supabase client */
-// deno-lint-ignore no-explicit-any
-let supabase: null | SupabaseClient<any, 'public', any> = null
-
-/** Table name to read from */
-let tableName: null | string = null
+import type { Init, Item } from '../src/types.ts'
 
 /**
  * Initialize Supabase client
@@ -35,6 +19,12 @@ let tableName: null | string = null
 export const init: Init = (
   opts,
 ) => {
+  /** Supabase client */
+  // deno-lint-ignore no-explicit-any
+  let supabase: null | SupabaseClient<any, 'public', any> = null
+
+  /** Table name to read from */
+  let tableName: null | string = null
   if (!opts) {
     return Promise.reject('Missing init options')
   }
@@ -46,134 +36,128 @@ export const init: Init = (
   supabase = createClient(opts.url, opts.publicAnonKey)
   tableName = opts.tableName
 
-  return Promise.resolve()
-}
+  return Promise.resolve({
+    create: async <Schema extends Item>(
+      partialItem?: Partial<Schema>,
+    ) => {
+      if (!supabase || !tableName) {
+        throw Error('Storage not initialized')
+      }
 
-export const create: Create = async <Schema extends Item>(
-  partialItem?: Partial<Schema>,
-) => {
-  if (!supabase || !tableName) {
-    throw Error('Storage not initialized')
-  }
+      const item = { id: crypto.randomUUID(), ...partialItem }
 
-  const item = { id: crypto.randomUUID(), ...partialItem }
+      const { data, error } = await supabase
+        .from(tableName)
+        .insert([item])
+        .select()
 
-  const { data, error } = await supabase
-    .from(tableName)
-    .insert([item])
-    .select()
+      if (error) {
+        throw error
+      }
 
-  if (error) {
-    throw error
-  }
+      return data[0] as Schema
+    },
 
-  return data[0] as Schema
-}
+    get: async (id: string) => {
+      if (!supabase || !tableName) {
+        throw Error('Storage not initialized')
+      }
 
-export const get: Get = async (id: string) => {
-  if (!supabase || !tableName) {
-    throw Error('Storage not initialized')
-  }
+      const { data, error } = await supabase
+        .from(tableName)
+        .select()
+        .eq('id', id)
 
-  const { data, error } = await supabase
-    .from(tableName)
-    .select()
-    .eq('id', id)
+      if (error) {
+        throw error
+      }
 
-  if (error) {
-    throw error
-  }
+      if (data[0]) {
+        return data[0]
+      }
 
-  if (data[0]) {
-    return data[0]
-  }
+      return null
+    },
 
-  return null
-}
+    getAll: async () => {
+      if (!supabase || !tableName) {
+        throw Error('Storage not initialized')
+      }
 
-export const getAll: GetAll = async () => {
-  if (!supabase || !tableName) {
-    throw Error('Storage not initialized')
-  }
+      const { data, error } = await supabase
+        .from(tableName)
+        .select()
 
-  const { data, error } = await supabase
-    .from(tableName)
-    .select()
+      if (error) {
+        throw error
+      }
 
-  if (error) {
-    throw error
-  }
+      return data
+    },
 
-  return data
-}
+    update: async <Schema extends Item>(
+      id: string,
+      update: Partial<Schema>,
+    ) => {
+      if (!supabase || !tableName) {
+        throw Error('Storage not initialized')
+      }
 
-export const update: Update = async <Schema extends Item>(
-  id: string,
-  update: Partial<Schema>,
-) => {
-  if (!supabase || !tableName) {
-    throw Error('Storage not initialized')
-  }
+      const { data, error } = await supabase
+        .from(tableName)
+        .update(update)
+        .eq('id', id)
+        .select()
 
-  const { data, error } = await supabase
-    .from(tableName)
-    .update(update)
-    .eq('id', id)
-    .select()
+      if (error) {
+        throw error
+      }
 
-  if (error) {
-    throw error
-  }
+      if (data && data[0]) {
+        return data[0]
+      }
+    },
 
-  if (data && data[0]) {
-    return data[0]
-  }
-}
+    remove: async (id: string) => {
+      if (!supabase || !tableName) {
+        throw Error('Storage not initialized')
+      }
 
-export const remove: Remove = async (id: string) => {
-  if (!supabase || !tableName) {
-    throw Error('Storage not initialized')
-  }
+      const { data, error } = await supabase
+        .from(tableName)
+        .delete()
+        .eq('id', id)
+        .select()
 
-  const { data, error } = await supabase
-    .from(tableName)
-    .delete()
-    .eq('id', id)
-    .select()
+      if (error) {
+        throw error
+      }
 
-  if (error) {
-    throw error
-  }
+      if (data && data[0]) {
+        return data[0]
+      }
+    },
 
-  if (data && data[0]) {
-    return data[0]
-  }
-}
+    removeAll: async () => {
+      if (!supabase || !tableName) {
+        throw Error('Storage not initialized')
+      }
 
-export const removeAll: RemoveAll = async () => {
-  if (!supabase || !tableName) {
-    throw Error('Storage not initialized')
-  }
+      const { data, error } = await supabase
+        .from(tableName)
+        .delete()
+        .neq('id', crypto.randomUUID())
+        .select()
 
-  const { data, error } = await supabase
-    .from(tableName)
-    .delete()
-    .neq('id', crypto.randomUUID())
-    .select()
+      if (error) {
+        throw error
+      }
 
-  if (error) {
-    throw error
-  }
-
-  return data
+      return data
+    },
+  })
 }
 
 export default {
-  create,
-  get,
-  getAll,
   init,
-  remove,
-  removeAll,
-  update,
 }

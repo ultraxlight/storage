@@ -1,17 +1,8 @@
 /**
- * @file
+ * @file In memory implementation of Storage
  */
 
-import type {
-  Create,
-  Get,
-  GetAll,
-  Init,
-  Item,
-  Remove,
-  RemoveAll,
-  Update,
-} from '../src/types.ts'
+import type { Init, Item } from '../src/types.ts'
 
 interface Database<Schema extends Item> {
   [id: string]: Schema
@@ -28,73 +19,71 @@ const getDB = <Schema extends Item>(): Database<Schema> => {
   return DB
 }
 
-export const init: Init = () => Promise.resolve()
+export const init: Init = () => {
+  const db = {
+    create: <Schema extends Item>(
+      partialItem?: Partial<Schema>,
+    ) => {
+      const DB = getDB<Schema>()
+      const item = { id: crypto.randomUUID(), ...partialItem } as Schema
 
-export const create: Create = <Schema extends Item>(
-  partialItem?: Partial<Schema>,
-) => {
-  const DB = getDB<Schema>()
-  const item = { id: crypto.randomUUID(), ...partialItem } as Schema
+      DB[item.id] = item
 
-  DB[item.id] = item
+      return Promise.resolve(item)
+    },
 
-  return Promise.resolve(item)
-}
+    get: <Schema extends Item>(id: string) => {
+      const DB = getDB<Schema>()
+      const listItem: Schema | null = DB[id] || null // as Schema
 
-export const get: Get = <Schema extends Item>(id: string) => {
-  const DB = getDB<Schema>()
-  const listItem: Schema | null = DB[id] || null // as Schema
+      return Promise.resolve(listItem) as Promise<Schema | null>
+    },
 
-  return Promise.resolve(listItem) as Promise<Schema | null>
-}
+    getAll: <Schema extends Item>() => {
+      const DB = getDB<Schema>()
+      const listItems: Schema[] = Object.values(DB)
 
-export const getAll: GetAll = <Schema extends Item>() => {
-  const DB = getDB<Schema>()
-  const listItems: Schema[] = Object.values(DB)
+      return Promise.resolve(listItems)
+    },
 
-  return Promise.resolve(listItems)
-}
+    update: async <Schema extends Item>(
+      id: string,
+      update: Partial<Schema>,
+    ) => {
+      const DB = getDB<Schema>()
+      const item = await db.get<Schema>(id)
 
-export const update: Update = async <Schema extends Item>(
-  id: string,
-  update: Partial<Schema>,
-) => {
-  const DB = getDB<Schema>()
-  const item = await get<Schema>(id)
+      if (item) {
+        const updatedItem = { ...item, ...update } as Schema
+        DB[id] = updatedItem
 
-  if (item) {
-    const updatedItem = { ...item, ...update } as Schema
-    DB[id] = updatedItem
+        return Promise.resolve(updatedItem)
+      } else {
+        return Promise.reject(Error(`Item with ID: '${id}' not found`))
+      }
+    },
 
-    return Promise.resolve(updatedItem)
-  } else {
-    return Promise.reject(Error(`Item with ID: '${id}' not found`))
+    remove: <Schema extends Item>(id: string) => {
+      const DB = getDB<Schema>()
+      const item = db.get<Schema>(id)
+
+      delete DB[id]
+
+      return item
+    },
+
+    removeAll: <Schema extends Item>() => {
+      const items = Object.values(getDB<Schema>())
+
+      DB = {}
+
+      return Promise.resolve(items)
+    },
   }
-}
 
-export const remove: Remove = <Schema extends Item>(id: string) => {
-  const DB = getDB<Schema>()
-  const item = get<Schema>(id)
-
-  delete DB[id]
-
-  return item
-}
-
-export const removeAll: RemoveAll = async <Schema extends Item>() => {
-  const items = Object.values(await getDB<Schema>())
-
-  DB = {}
-
-  return items
+  return Promise.resolve(db)
 }
 
 export default {
-  create,
-  get,
-  getAll,
   init,
-  remove,
-  removeAll,
-  update,
 }

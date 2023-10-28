@@ -2,85 +2,69 @@
  * @file LocalStorage implementation of Storage
  */
 
-import type {
-  Create,
-  Get,
-  GetAll,
-  Init,
-  Item,
-  Remove,
-  RemoveAll,
-  Update,
-} from '../src/types.ts'
+import type { Init, Item } from '../src/types.ts'
 
-export const init: Init = () => Promise.resolve()
+export const init: Init = () => {
+  const db = {
+    create: <Schema extends Item>(
+      partialItem?: Partial<Schema>,
+    ) => {
+      const item = { id: crypto.randomUUID(), ...partialItem } as Schema
 
-export const create: Create = <Schema extends Item>(
-  partialItem?: Partial<Schema>,
-) => {
-  const item = { id: crypto.randomUUID(), ...partialItem } as Schema
+      localStorage.setItem(item.id, JSON.stringify(item))
 
-  localStorage.setItem(item.id, JSON.stringify(item))
+      return Promise.resolve(item)
+    },
 
-  return Promise.resolve(item)
-}
+    get: <Schema extends Item>(id: string) => {
+      const listItem = localStorage.getItem(id)
+      return Promise.resolve(listItem && JSON.parse(listItem) as Schema || null)
+    },
 
-export const get: Get = (id: string) => {
-  const listItem = localStorage.getItem(id)
+    getAll: <Schema extends Item>() => {
+      const listItems: Schema[] = Object.values({ ...localStorage }).map((
+        str,
+      ) => JSON.parse(str))
 
-  if (listItem) {
-    return JSON.parse(listItem)
+      return Promise.resolve(listItems)
+    },
+
+    update: async <Schema extends Item>(
+      id: string,
+      update: Partial<Schema>,
+    ) => {
+      const item = await db.get<Schema>(id)
+
+      if (item) {
+        const updatedItem = { ...item, ...update }
+        localStorage.setItem(id, JSON.stringify(updatedItem))
+
+        return Promise.resolve(updatedItem)
+      }
+
+      return Promise.reject(Error(`Item with ID: '${id}' not found`))
+    },
+
+    remove: <Schema extends Item>(id: string) => {
+      const item = db.get<Schema>(id)
+
+      localStorage.removeItem(id)
+
+      return item
+    },
+
+    removeAll: <Schema extends Item>() => {
+      const items = db.getAll<Schema>()
+
+      localStorage.clear()
+
+      return items
+    },
   }
 
-  return null
-}
-
-export const getAll: GetAll = <Schema extends Item>() => {
-  const listItems: Schema[] = Object.values({ ...localStorage }).map((str) =>
-    JSON.parse(str)
-  )
-
-  return Promise.resolve(listItems)
-}
-
-export const update: Update = async <Schema extends Item>(
-  id: string,
-  update: Partial<Schema>,
-) => {
-  const item = await get<Schema>(id)
-
-  if (item) {
-    const updatedItem = { ...item, ...update }
-    localStorage.setItem(id, JSON.stringify(updatedItem))
-
-    return Promise.resolve(updatedItem)
-  } else {
-    return Promise.reject(Error(`Item with ID: '${id}' not found`))
-  }
-}
-
-export const remove: Remove = <Schema extends Item>(id: string) => {
-  const item = get<Schema>(id)
-
-  localStorage.removeItem(id)
-
-  return item
-}
-
-export const removeAll: RemoveAll = <Schema extends Item>() => {
-  const items = getAll<Schema>()
-
-  localStorage.clear()
-
-  return items
+  return Promise.resolve(db)
 }
 
 export default {
-  create,
-  get,
-  getAll,
   init,
-  remove,
-  removeAll,
-  update,
 }

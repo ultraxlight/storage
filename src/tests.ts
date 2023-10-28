@@ -11,24 +11,24 @@ interface Schema {
 
 import Storage from '../src/types.ts'
 
-export default function (storage: Storage, initOptions?: object) {
-  storage.init(initOptions)
+export default async function (storage: Storage, initOptions?: object) {
+  const db = await storage.init(initOptions)
 
   Deno.test('Standard Storage tests', async (t) => {
     await t.step('Empty call creates object with just ID', async () => {
-      const newItem = await storage.create()
+      const newItem = await db.create()
       assertEquals(typeof newItem.id, 'string')
     })
 
     await t.step('Attribute can be passed', async () => {
-      const newItem = await storage.create<Schema>({ title: 'Mow the lawn' })
+      const newItem = await db.create<Schema>({ title: 'Mow the lawn' })
       assertEquals(typeof newItem.id, 'string')
       assertEquals(newItem.title, 'Mow the lawn')
     })
 
     await t.step('Get can retrieve single', async () => {
-      const newItem = await storage.create<Schema>({ title: 'Mow the lawn' })
-      const retrievedItem = await storage.get<Schema>(newItem.id)
+      const newItem = await db.create<Schema>({ title: 'Mow the lawn' })
+      const retrievedItem = await db.get<Schema>(newItem.id)
       assertEquals(
         newItem.id,
         retrievedItem && !Array.isArray(retrievedItem) && retrievedItem.id,
@@ -40,11 +40,11 @@ export default function (storage: Storage, initOptions?: object) {
     })
 
     await t.step('Update updates', async () => {
-      const newItem = await storage.create<Schema>({ title: 'Mow the lawn' })
-      const updatedItem = await storage.update<Schema>(newItem.id, {
+      const newItem = await db.create<Schema>({ title: 'Mow the lawn' })
+      const updatedItem = await db.update<Schema>(newItem.id, {
         title: 'Mow the neighbor\'s lawn',
       })
-      const retrievedItem = await storage.get<Schema>(newItem.id)
+      const retrievedItem = await db.get<Schema>(newItem.id)
 
       assertEquals(
         retrievedItem?.title,
@@ -60,16 +60,16 @@ export default function (storage: Storage, initOptions?: object) {
     await t.step('Update w/ bad ID throws', async () => {
       await assertRejects(
         async () =>
-          await storage.update<Schema>('WRONG', {
+          await db.update<Schema>('WRONG', {
             title: 'Mow the neighbor\'s lawn',
           }),
       )
     })
 
     await t.step('GetAll can retrieve multiple', async () => {
-      const newLi1 = await storage.create<Schema>({ title: 'Mow the lawn' })
-      const newLi2 = await storage.create<Schema>({ title: 'Mow the lawn 2' })
-      const retrievedLis = await storage.getAll<Schema>()
+      const newLi1 = await db.create<Schema>({ title: 'Mow the lawn' })
+      const newLi2 = await db.create<Schema>({ title: 'Mow the lawn 2' })
+      const retrievedLis = await db.getAll<Schema>()
       const retrievedLi1 = Array.isArray(retrievedLis) &&
         retrievedLis.find((rLi) => rLi.id === newLi1.id)
       const retrievedLi2 = Array.isArray(retrievedLis) &&
@@ -86,8 +86,8 @@ export default function (storage: Storage, initOptions?: object) {
     })
 
     await t.step('remove removes', async () => {
-      const newItem = await storage.create<Schema>({ title: 'Mow the lawn' })
-      const retrievedItemBeforeRemove = await storage.get<Schema>(newItem.id)
+      const newItem = await db.create<Schema>({ title: 'Mow the lawn' })
+      const retrievedItemBeforeRemove = await db.get<Schema>(newItem.id)
 
       assertEquals(
         !Array.isArray(retrievedItemBeforeRemove) &&
@@ -95,17 +95,17 @@ export default function (storage: Storage, initOptions?: object) {
         'Mow the lawn',
       )
 
-      await storage.remove(newItem.id)
+      await db.remove(newItem.id)
 
       assertEquals(
-        await storage.get<Schema>(newItem.id),
+        await db.get<Schema>(newItem.id),
         null,
       )
     })
 
     await t.step('remove returns removed', async () => {
-      const newItem = await storage.create<Schema>({ title: 'Mow the lawn' })
-      const removedItem = await storage.remove(newItem.id)
+      const newItem = await db.create<Schema>({ title: 'Mow the lawn' })
+      const removedItem = await db.remove(newItem.id)
 
       assertEquals(
         newItem,
@@ -114,26 +114,26 @@ export default function (storage: Storage, initOptions?: object) {
     })
 
     await t.step('removeAll removes all', async () => {
-      await storage.create<Schema>({ title: 'Mow the lawn' })
-      await storage.create<Schema>({ title: 'Mow the lawn 2' })
+      await db.create<Schema>({ title: 'Mow the lawn' })
+      await db.create<Schema>({ title: 'Mow the lawn 2' })
 
-      const items = await storage.getAll()
+      const items = await db.getAll()
 
       assert(
         Array.isArray(items) && items.length > 1,
       )
 
-      await storage.removeAll()
+      await db.removeAll()
 
       assertEquals(
-        await storage.getAll<Schema>(),
+        await db.getAll<Schema>(),
         [],
       )
     })
 
     await t.step('removeAll returns all', async () => {
-      const item1 = await storage.create<Schema>({ title: 'Mow the lawn' })
-      const item2 = await storage.create<Schema>({ title: 'Mow the lawn 2' })
+      const item1 = await db.create<Schema>({ title: 'Mow the lawn' })
+      const item2 = await db.create<Schema>({ title: 'Mow the lawn 2' })
 
       const sortByTitle = (
         a: Schema,
@@ -148,7 +148,7 @@ export default function (storage: Storage, initOptions?: object) {
         return 0
       }
 
-      const removed = await storage.removeAll<{ title: string; id: string }>()
+      const removed = await db.removeAll<{ title: string; id: string }>()
 
       assertEquals(
         [item1, item2].sort(sortByTitle),

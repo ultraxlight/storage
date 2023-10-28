@@ -8,32 +8,4 @@ Deno.test('Additional Supabase tests', async (t) => {
       async () => await Storage.init(),
     )
   })
-
-  await t.step('Init must be called before Create', async () => {
-    await assertRejects(
-      async () => await Storage.create(),
-    )
-  })
-
-  await t.step('Init must be called before Get', async () => {
-    await assertRejects(async () => await Storage.get('a'))
-  })
-
-  await t.step('Init must be called before GetAll', async () => {
-    await assertRejects(async () => await Storage.getAll())
-  })
-
-  await t.step('Init must be called before Update', async () => {
-    await assertRejects(async () =>
-      await Storage.update<{ id: string; title: string }>('a', { title: 'b' })
-    )
-  })
-
-  await t.step('Init must be called before Remove', async () => {
-    await assertRejects(async () => await Storage.remove('a'))
-  })
-
-  await t.step('Init must be called before RemoveAll', async () => {
-    await assertRejects(async () => await Storage.removeAll())
-  })
 })
