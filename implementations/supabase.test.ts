@@ -11,5 +11,5 @@ import Tests from '../src/tests.ts'
 Tests(Storage, {
   url: supabaseUrl,
   publicAnonKey: supabasePublicAnonKey,
-  tableName: 'list-items',
+  tableName: 'storage-test',
 })
