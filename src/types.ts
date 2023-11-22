@@ -1,7 +1,9 @@
+/** A stored item */
 export interface Item {
   id: string
 }
 
+/** Initialize Storage */
 export interface Init {
   // deno-lint-ignore no-explicit-any
   <InitObj extends { [key: string]: any }>(
@@ -68,7 +70,8 @@ export interface RemoveAll {
   <Schema extends Item>(): Promise<Schema[] | null>
 }
 
-export default interface Storage {
+/** Storage */
+export interface Storage {
   create: Create
   get: Get
   getAll: GetAll
@@ -77,6 +80,7 @@ export default interface Storage {
   removeAll: RemoveAll
 }
 
+/** Default export for implementation modules */
 export interface StorageInit {
   init: Init
 }
